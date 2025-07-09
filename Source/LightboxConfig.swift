@@ -7,6 +7,8 @@ public class LightboxConfig {
   public static var hideStatusBar = true
     
   public static var imageBackgroundColor = UIColor.black
+    
+  public static var dismissPercentage = 0.1
 
   /// Provide a closure to handle selected video
   @MainActor

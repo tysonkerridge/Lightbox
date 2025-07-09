@@ -59,7 +59,7 @@ class LightboxTransition: UIPercentDrivenInteractiveTransition {
       interactive = false
       lightboxController?.presented = true
 
-      if percentage > 0.1 {
+      if percentage > LightboxConfig.dismissPercentage {
         finish()
         guard let controller = lightboxController else { return }
 

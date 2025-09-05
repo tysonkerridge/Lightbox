@@ -470,6 +470,40 @@ extension LightboxController: HeaderViewDelegate {
       deleteButton.isEnabled = true
     }
   }
+    
+    func headerView(_ headerView: HeaderView, didPressShareButton shareButton: UIButton) {
+        guard currentPage >= 0, currentPage < pageViews.count else {
+          return
+        }
+
+        let pageView = pageViews[currentPage]
+        
+        if let url = pageView.image.videoURL {
+            let activityController = UIActivityViewController(activityItems: [url], applicationActivities: nil)
+            
+            // For iPad compatibility
+            if let popover = activityController.popoverPresentationController {
+                popover.sourceView = shareButton
+                popover.sourceRect = shareButton.bounds
+            }
+            
+            present(activityController, animated: true, completion: nil)
+            return
+        }
+        guard let image = pageView.imageView.image else {
+          return
+        }
+
+        let activityController = UIActivityViewController(activityItems: [image], applicationActivities: nil)
+
+        // For iPad compatibility
+        if let popover = activityController.popoverPresentationController {
+          popover.sourceView = shareButton
+          popover.sourceRect = shareButton.bounds
+        }
+
+        present(activityController, animated: true, completion: nil)
+    }
 
   func headerView(_ headerView: HeaderView, didPressCloseButton closeButton: UIButton) {
     closeButton.isEnabled = false

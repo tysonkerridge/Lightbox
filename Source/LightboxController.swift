@@ -153,6 +153,7 @@ open class LightboxController: UIViewController {
   open weak var imageTouchDelegate: (any LightboxControllerTouchDelegate)?
   open weak var imageTapDelegate: (any LightboxControllerTapDelegate)?
   open weak var imageDeleteDelegate: (any LightboxControllerDeleteDelegate)?
+  open var activityViewControllerCompletionHandler: UIActivityViewController.CompletionWithItemsHandler?
   open internal(set) var presented = false
   open fileprivate(set) var seen = false
 
@@ -472,37 +473,30 @@ extension LightboxController: HeaderViewDelegate {
   }
     
     func headerView(_ headerView: HeaderView, didPressShareButton shareButton: UIButton) {
-        guard currentPage >= 0, currentPage < pageViews.count else {
-          return
-        }
-
-        let pageView = pageViews[currentPage]
+        guard
+            currentPage >= 0, currentPage < pageViews.count
+        else { return }
         
-        if let url = pageView.image.videoURL {
-            let activityController = UIActivityViewController(activityItems: [url], applicationActivities: nil)
-            
-            // For iPad compatibility
-            if let popover = activityController.popoverPresentationController {
-                popover.sourceView = shareButton
-                popover.sourceRect = shareButton.bounds
-            }
-            
-            present(activityController, animated: true, completion: nil)
-            return
+        let pageView = pageViews[currentPage]
+        let shareItem: Any?
+        
+        if let videoURL = pageView.image.videoURL {
+            shareItem = videoURL
+        } else {
+            shareItem = pageView.imageView.image
         }
-        guard let image = pageView.imageView.image else {
-          return
-        }
-
-        let activityController = UIActivityViewController(activityItems: [image], applicationActivities: nil)
-
-        // For iPad compatibility
+        
+        guard let itemToShare = shareItem else { return }
+        
+        let activityController = UIActivityViewController(activityItems: [itemToShare], applicationActivities: nil)
+        activityController.completionWithItemsHandler = activityViewControllerCompletionHandler
+        
         if let popover = activityController.popoverPresentationController {
-          popover.sourceView = shareButton
-          popover.sourceRect = shareButton.bounds
+            popover.sourceView = shareButton
+            popover.sourceRect = shareButton.bounds
         }
-
-        present(activityController, animated: true, completion: nil)
+        
+        present(activityController, animated: true)
     }
 
   func headerView(_ headerView: HeaderView, didPressCloseButton closeButton: UIButton) {
